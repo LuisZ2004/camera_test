@@ -1,15 +1,26 @@
 <!DOCTYPE html>
-<head>
-    <title>Camera App</title>
-    <link rel="'stylesheet" href = "style.css">
-    <script src = "script.js"></script>
-</head>
-<body>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <video id='video' width="240" height="240" autoplay muted playsinline></video><br>
-    <button onclick="start()" style="width:20vw;height:20vw;">start</button>
-</body>
-<footer>
-    
-</footer>
+<html lang="en">
+    <head>
+        <title>Camera App</title>
+        <link rel="stylesheet" href="style.css">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        </head>
+    <body>
+        <main> 
+            <button id="permissions-button">Allow Camera</button>
+            <camera-box>
+                <video id = "video">Video Stream not available</video>
+                <footer>
+                    <button id = "start-button"><img src = "images/camera-1389.svg" alt="Take Picture"></button>
+                    <canvas id="canvas"></canvas>
+                    <stored-photos>
+                        <img id="photo">
+                    </stored-photos>
+                </footer>
+            </camera-box>
+        </main>
+        
+        <script src="script.js"></script>
+    </body>
+</html>

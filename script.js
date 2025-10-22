@@ -1,40 +1,69 @@
-async function setupCamera() {
-  const stream = await navigator.mediaDevices.getUserMedia({'audio': true, 'video': true});
-	const video = document.getElementById('video');
-  video.srcObject = stream;
-  return new Promise((resolve) => {
-    video.onloadedmetadata = () => {
-      video.width = video.videoWidth / 3;
-      video.height = video.videoHeight / 3;
-			resolve();
-    };
-  });
-}
+const width = screen.width / 2;
+let height = 0;
 
-async function start(){
-  await setupCamera();
-  const deviceInfos = await navigator.mediaDevices.enumerateDevices();
-	deviceInfos.forEach(deviceInfo=>{
-		console.log(deviceInfo.kind, deviceInfo.label, deviceInfo.deviceId);
-	})
-	const constraints = await navigator.mediaDevices.getSupportedConstraints();
-	for (const [key, value] of Object.entries(constraints)) {
-    console.log(`${key}: ${value}`);
-  }
-  navigator.mediaDevices.ondevicechange = function(event) {
-    console.log("ondevicechange", event)
-  }
-}
+let streaming = false;
 
-window.addEventListener('load', async ()=>{
-  if(!navigator.permissions || !navigator.permissions.query){
-    console.log("this browser doesn't have permission API", navigator.userAgent)
-  }
-  if(!navigator.mediaDevices.getDisplayMedia){
-    console.log("this browser doesn't have getDisplayMedia", navigator.userAgent)
-  }
-	const deviceInfos = await navigator.mediaDevices.enumerateDevices();
-	deviceInfos.forEach(deviceInfo=>{
-		console.log(deviceInfo.kind, deviceInfo.label, deviceInfo.deviceId);
-	})
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const photo = document.getElementById("photo");
+const startButton = document.getElementById("start-button");
+const allowButton = document.getElementById("permissions-button");
+
+allowButton.addEventListener("click", () => {
+  navigator.mediaDevices
+    .getUserMedia({ video: true, audio: false })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
+    })
+    .catch((err) => {
+      console.error(`An error occurred: ${err}`);
+    });
 });
+
+video.addEventListener("canplay", (ev) => {
+  if (!streaming) {
+    height = video.videoHeight / (video.videoWidth / width);
+
+    video.setAttribute("width", width);
+    video.setAttribute("height", height);
+    canvas.setAttribute("width", width);
+    canvas.setAttribute("height", height);
+    streaming = true;
+  }
+});
+
+startButton.addEventListener("click", (ev) => {
+  takePicture();
+  ev.preventDefault();
+});
+
+function clearPhoto() {
+  const context = canvas.getContext("2d");
+  context.fillStyle = "#b7b7b7ff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  const data = canvas.toDataURL("image/png");
+  photo.setAttribute("src", data);
+}
+
+clearPhoto();
+
+function storePicture(){
+  
+}
+
+function takePicture() {
+  const context = canvas.getContext("2d");
+  if (width && height) {
+    canvas.width = width;
+    canvas.height = height;
+    context.drawImage(video, 0, 0, width, height);
+
+    const data = canvas.toDataURL("image/png");
+    photo.setAttribute("src", data);
+  } else {
+    clearPhoto();
+  }
+}
+
