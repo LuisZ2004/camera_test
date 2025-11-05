@@ -1,4 +1,4 @@
-const width = 320; 
+const width = 300; 
 let height = 0; 
 let streaming = false;
 
@@ -12,11 +12,79 @@ const allowButton = document.getElementById("permissions-button");
 const galleryLeftBtn = document.getElementById("gallery-left");
 const galleryRightBtn = document.getElementById("gallery-right");
 const output = document.querySelector(".output");
+const deleteButton = document.getElementById("delete")
+const filterSelect = document.getElementById("filter");
 
 let currentPhotoIndex = 0; 
-
+let animationFrameId = null;
 const photosPerView = 3; 
 
+/* --------- Filter Stuff -----------*/ 
+const filters = {
+    "none" : "No filter",
+    "8bit": "8-Bit Pixel", 
+    "grayscale(1)": "Grayscale",
+    "invert(1)": "Invert",
+}
+
+function populateFilters() {
+  filterSelect.innerHTML = "";
+
+  for (const [filterValue, displayText] of Object.entries(filters)) {
+    const option = document.createElement("option");
+    option.value = filterValue;
+    option.textContent = displayText;
+    filterSelect.appendChild(option);
+  }
+}
+
+function applyFilter(canvas, image, filterType){
+  const context = canvas.getContext("2d");
+
+  canvas.width = width;
+  canvas.height = height;
+
+  if(filterType === '8bit'){
+    eightBit(canvas,image, 10);
+  }else {
+    context.filter = filterType;
+    context.drawImage(image,0,0,canvas.width,canvas.height);
+  }
+}
+function drawVideoToCanvas() {
+  if (streaming) {
+    // Apply the 8bit filter from the video to the main canvas
+    applyFilter(canvas, video, '8bit');
+    
+    // Request the next frame to create a live video effect
+    animationFrameId = requestAnimationFrame(drawVideoToCanvas);
+  }
+}
+
+function updateLiveFilter() {
+  const selectedFilter = filterSelect.value;
+
+  if (selectedFilter === '8bit') {
+    video.style.display = 'none';
+    canvas.style.display = 'block';
+
+    if (!animationFrameId) {
+      drawVideoToCanvas();
+    }
+  } else {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+
+    video.style.display = 'block';
+    canvas.style.display = 'none';
+    
+    video.style.filter = selectedFilter;
+  }
+}
+
+/* ------------------------------*/
 
 allowButton.addEventListener("click", () => {
   navigator.mediaDevices
@@ -39,6 +107,7 @@ video.addEventListener("canplay", (ev) => {
     canvas.setAttribute("width", width);
     canvas.setAttribute("height", height);
     streaming = true;
+    canvas.style.display = "none"
   }
 });
 
@@ -51,17 +120,20 @@ startButton.addEventListener("click", (ev) => {
 
 function clearPhoto() {
   const context = canvas.getContext("2d");
-  context.fillStyle = "#aaaaaa";
+  context.fillStyle = "#ffffff";
   context.fillRect(0, 0, canvas.width, canvas.height);
+  
+  if (filterSelect.value !== '8bit') {
+    canvas.style.display = 'none';
+  }
 }
 clearPhoto();
-
 
 function takePicture() {
   const context = canvas.getContext("2d");
   if (width && height) {
     context.drawImage(video, 0, 0, width, height);
-    const data = canvas.toDataURL("image/png");
+    const data = canvas.toDataURL("image/png");   
     clearPhoto(); 
 
     let photos = JSON.parse(localStorage.getItem('storedPhotos')) || [];
@@ -80,37 +152,36 @@ function takePicture() {
 
 function updateGalleryView() {
   const photos = JSON.parse(localStorage.getItem('storedPhotos')) || [];
-  
-  output.innerHTML = "";
+  output.innerHTML = ""; 
+
+  const selectedFilter = filterSelect.value;
 
   const chunk = photos.slice(currentPhotoIndex, currentPhotoIndex + photosPerView);
 
   if (chunk.length === 0) {
     output.innerHTML = "<p>No photos saved yet.</p>";
-  } else {
-    chunk.forEach((dataURL) => {
-      const img = document.createElement("img");
-      img.setAttribute("src", dataURL);
-      img.classList.add("gallery-thumbnail");
-      output.appendChild(img);
-    });
   }
 
-  if (currentPhotoIndex === 0) {
-    galleryLeftBtn.disabled = true;
-    galleryLeftBtn.classList.add("disabled");
-  } else {
-    galleryLeftBtn.disabled = false;
-    galleryLeftBtn.classList.remove("disabled");
-  }
+  chunk.forEach((dataURL) => {
+    const img = new Image();
+    
+    img.onload = () => {
+      const galleryCanvas = document.createElement("canvas");
+      galleryCanvas.classList.add("gallery-thumbnail");
 
-  if (currentPhotoIndex + photosPerView >= photos.length) {
-    galleryRightBtn.disabled = true;
-    galleryRightBtn.classList.add("disabled");
-  } else {
-    galleryRightBtn.disabled = false;
-    galleryRightBtn.classList.remove("disabled");
-  }
+      applyFilter(galleryCanvas, img, selectedFilter);
+
+      output.appendChild(galleryCanvas);
+    };
+
+    img.src = dataURL;
+  });
+
+  galleryLeftBtn.disabled = (currentPhotoIndex === 0);
+  galleryLeftBtn.classList.toggle("disabled", currentPhotoIndex === 0);
+
+  galleryRightBtn.disabled = (currentPhotoIndex + photosPerView >= photos.length);
+  galleryRightBtn.classList.toggle("disabled", (currentPhotoIndex + photosPerView >= photos.length));
 }
 
 
@@ -127,4 +198,17 @@ galleryRightBtn.addEventListener("click", () => {
   }
 });
 
+deleteButton.addEventListener("click",() =>{
+  localStorage.clear();
+  currentPhotoIndex = 0;
+  updateGalleryView();
+})
+
+filterSelect.addEventListener("change", () => {
+  updateGalleryView();
+  updateLiveFilter();
+});
+
+populateFilters();
 updateGalleryView();
+updateLiveFilter();

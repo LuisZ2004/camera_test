@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="home.css">
+        <link rel="stylesheet" href="style.css">
     </head>
 
     <body>
@@ -11,20 +11,24 @@
             <camera-output>
                 <video id="video">Video stream not available.</video>
             </camera-output>
-            
+            <br>
             <canvas id="canvas"></canvas>
-
+            <br>
+            Select a Filter
+            <select id = "filter"></select>
             <photo-gallery class="output">
                 
             </photo-gallery>
-
+            <br>
             <control-buttons>
                 <button id="permissions-button">Allow Camera</button>
-                <button id="start-button">Capture photo</button>
+                <button id="start-button">Take photo</button>
                 <button id="gallery-left" class="gallery-arrow">&lt;</button>
                 <button id="gallery-right" class="gallery-arrow">&gt;</button>
-        </control-buttons>
+                <button id="delete">Delete All</button>
+            </control-buttons>
         </main>
+        <script src = "8bit.js"></script>
         <script src="script.js"></script>
     </body>
 
