@@ -99,7 +99,7 @@ class FilterManager {
     }
     /**
      * Returns an array of all filters
-     * @returns {Array[Filter]}
+     * @returns {Filter}
      */
     getAllFilters(){
         return Array.from(this.filters.values());
