@@ -10,7 +10,7 @@ class Filter {
    * @param {string} name 
    * @param {string} displayName 
    * @param {string} type 
-   * @param {string / function} value 
+   * @param {string} value 
    */
   constructor(name, displayName, type, value){
     this.name        = name;
@@ -83,7 +83,7 @@ class FilterManager {
      * @param {string} name 
      * @param {string} displayName 
      * @param {string} type 
-     * @param {string / function} value 
+     * @param {string} value 
      */
     addFilter(name, displayName, type, value){
         const filter = new Filter(name, displayName, type, value);
@@ -92,14 +92,14 @@ class FilterManager {
     /**
      * Gets a filter by name
      * @param {string} name 
-     * @returns {filter}
+     * @returns {Filter}
      */
     getFilter(name){
         return this.filters.get(name);
     }
     /**
      * Returns an array of all filters
-     * @returns {Array[filters]}
+     * @returns {Array[Filter]}
      */
     getAllFilters(){
         return Array.from(this.filters.values());
