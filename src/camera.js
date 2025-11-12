@@ -126,7 +126,7 @@ class CameraManager{
     }
     /**
      * Returns canvas and video dimensions
-     * @returns {number, number}
+     * @returns {{number, number}}
      */
     getDimensions(){
         return{width: this.width,height: this.height};
