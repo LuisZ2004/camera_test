@@ -21,6 +21,9 @@ jobs:
 
       - name: Install dependencies (including jsdoc)
         run: npm install
+        
+      - name: Run ESLint
+        run: npm run lint
 
       - name: Generate JSDoc Documentation
         run: npm run docs
