@@ -46,7 +46,7 @@ class Filter {
  * Filter functions  named so far are eightbit and ASCII
  */
 const FilterFunctions = {
-    eightBit:(canvas, source, width, height)=> {
+    eightBit:(canvas, source, _width, _height)=> {
         if(typeof eightBit !== 'undefined'){
             eightBit(canvas, source, 10);
         }
