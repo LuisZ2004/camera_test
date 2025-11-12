@@ -31,7 +31,7 @@ function initializeFilters(){
 }
 /**
  * Gets pictures from local storage and adds to gallery, using the index and slice size to slide view
- * @returns 
+ * @returns {null}
  */
 function updateGalleryView(){
   output.innerHTML = "";
