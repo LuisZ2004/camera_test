@@ -1,3 +1,6 @@
+/**
+ * Sets up buttons and managers
+ */
 const filterManager  = new FilterManager();
 const storageManager = new StorageManager('storedPhotos');
 const cameraManager  = new CameraManager(document.getElementById("video"),document.getElementById("canvas"));
@@ -13,6 +16,9 @@ const filterSelect    = document.getElementById("filter");
 let currentPhotoIndex = 0;
 const photosPerView   = 3;
 
+/**
+ * Sets up filters from manager and fills select form
+ */
 function initializeFilters(){
   filterSelect.innerHTML = "";
   
@@ -23,7 +29,10 @@ function initializeFilters(){
     filterSelect.appendChild(option);
   });
 }
-
+/**
+ * Gets pictures from local storage and adds to gallery, using the index and slice size to slide view
+ * @returns 
+ */
 function updateGalleryView(){
   output.innerHTML = "";
   

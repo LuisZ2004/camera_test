@@ -1,4 +1,16 @@
+const { FilterManager } = require("./filters");
+
+/**
+ * Class for Camera and Camera functions
+ */
 class CameraManager{
+    /**
+     * Video element is the video input
+     * Canvas element is where video stream is being output
+     * Listens for camera input, has default width of 300
+     * @param {*} videoElement 
+     * @param {*} canvasElement 
+     */
     constructor(videoElement, canvasElement) {
         this.video            = videoElement;
         this.canvas           = canvasElement;
@@ -11,7 +23,10 @@ class CameraManager{
         
         this.setupVideoListener();
     }
-
+    /**
+     * Listens for permissions and upon getting media, the stream is set as camera input
+     * @returns {boolean}
+     */
     async requestPermissions(){
         this.stream = await navigator.mediaDevices.getUserMedia({ 
             video: true, 
@@ -21,7 +36,9 @@ class CameraManager{
         await this.video.play();
         return true;
     }
-
+    /**
+     * If the camera is not streaming, set height using aspect ratio and width and adjust video and canvas element
+     */
     setupVideoListener(){
         this.video.addEventListener("canplay",() => {
             if(!this.streaming){
@@ -34,7 +51,10 @@ class CameraManager{
             }
         });
     }
-
+    /**
+     * Takes photo and draws to canvas
+     * @returns {image}
+     */
     capturePhoto() {
         if(this.width && this.height){
             const context = this.canvas.getContext("2d");
@@ -43,7 +63,11 @@ class CameraManager{
         }
         return null;
     }
-
+    /**
+     * Inputs a filtermanager class and name for a filter, gets the filter and applys to canvas
+     * @param {FilterManager} filterManager 
+     * @param {string} filterName 
+     */
     applyLiveFilter(filterManager, filterName){
         this.currentFilter = filterName;
         const filter = filterManager.getFilter(filterName);
@@ -71,13 +95,17 @@ class CameraManager{
             this.video.style.filter = filter.value;
         }
     }
-
+    /**
+     * canvas gets cleared
+     */
     clearCanvas(){
         const context = this.canvas.getContext("2d");
         context.fillStyle = "#ffffff";
         context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
-
+    /**
+     * stop camera stream 
+     */
     stopCamera(){
         if(this.stream){
             this.stream.getTracks().forEach(track => track.stop());
@@ -89,11 +117,17 @@ class CameraManager{
             this.animationFrameId = null;
         }
     }
-
+    /**
+     * Checks if the stream is on
+     * @returns {boolean}
+     */
     isStreaming(){
         return this.streaming;
     }
-
+    /**
+     * Returns canvas and video dimensions
+     * @returns {number, number}
+     */
     getDimensions(){
         return{width: this.width,height: this.height};
     }
