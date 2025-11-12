@@ -7,8 +7,7 @@
   "opts": {
     "encoding": "utf8",
     "recurse": true,
-    "destination": "./docs/",
-    "template": "node_modules/clean-jsdoc-theme" 
+    "destination": "./docs/"
   },
   "plugins": [
     "plugins/markdown"
